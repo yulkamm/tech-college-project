@@ -6,6 +6,10 @@ const path = require('path');
 require('dotenv').config();
 
 const app = express();
+
+// 🔥 ВАЖНО: Доверенный прокси для Railway (исправляет сессии!)
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3000;
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -15,16 +19,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/photos', express.static(path.join(__dirname, 'public/photos')));
 
-// Session - ИСПРАВЛЕНО
+// Session - ИСПРАВЛЕНО для Railway/HTTPS
 app.use(session({
     secret: process.env.SESSION_SECRET || 'tech-college-secret-2026',
     resave: false,
     saveUninitialized: false,
     cookie: { 
         maxAge: 24 * 60 * 60 * 1000,
-        secure: true,  // Всегда true для HTTPS
-        httpOnly: true,
-        sameSite: 'none'  // Всегда none для кросс-доменных запросов
+        secure: true,           // true для HTTPS (Railway)
+        httpOnly: true,         // защита от XSS
+        sameSite: 'none'        // важно для кросс-доменных запросов
     }
 }));
 
