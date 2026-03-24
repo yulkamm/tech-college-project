@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>АПТ - Ангарский политехнический техникум</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
+        
+        nav { 
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
+            padding: 15px 30px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        nav a { 
+            color: white; 
+            margin-right: 25px; 
+            text-decoration: none; 
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        nav a:hover { opacity: 0.8; }
+        .user-info { color: white; display: flex; align-items: center; gap: 15px; }
+        
+        .hero {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 80px 30px;
+            text-align: center;
+        }
+        .hero h1 { 
+            font-size: 3.5em; 
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .hero p { 
+            font-size: 1.5em; 
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+        .hero .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .welcome-section {
+            padding: 60px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            margin-top: -50px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+        .welcome-section h2 {
+            text-align: center;
+            color: #1e3c72;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        .welcome-section p {
+            text-align: center;
+            color: #555;
+            font-size: 1.2em;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto 40px;
+        }
+        
+        .photos-section {
+            padding: 50px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .photos-section h2 {
+            text-align: center;
+            margin-bottom: 50px;
+            color: #1e3c72;
+            font-size: 2.2em;
+        }
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .photo-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .photo-card:hover { 
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .photo-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        .photo-card h3 {
+            padding: 25px;
+            color: #1e3c72;
+            text-align: center;
+            font-size: 1.4em;
+        }
+        
+        footer {
+            background: #1e3c72;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+        }
+        footer p { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div>
+            <a href="/" style="font-size: 1.3em; font-weight: bold;">🎓 АПТ</a>
+            <a href="/about">О техникуме</a>
+            <a href="/contact">Контакты</a>
+            <a href="/students">Студенты</a>
+            <a href="/teachers">Преподаватели</a>
+        </div>
+        <div class="user-info" id="userInfo"></div>
+    </nav>
+    
+    <div class="hero">
+        <h1>Ангарский политехнический техникум</h1>
+        <p>Добро пожаловать!</p>
+        <p class="subtitle">Современное образование для вашего успешного будущего</p>
+    </div>
+    
+    <div class="welcome-section">
+        <h2>Добро пожаловать в АПТ!</h2>
+        <p>
+            Ангарский политехнический техникум — это современное образовательное учреждение, 
+            которое готовит квалифицированных специалистов с 1960 года. Мы предлагаем 
+            качественное образование, современную материально-техническую базу и тесную связь 
+            с работодателями.
+        </p>
+    </div>
+    
+    <div class="photos-section">
+        <h2>Наш техникум</h2>
+        <div class="photos-grid">
+            <div class="photo-card">
+                <img src="/photos/index_1.jpg" alt="Главный корпус">
+                <h3>Главный учебный корпус</h3>
+            </div>
+            <div class="photo-card">
+                <img src="/photos/index_2.jpg" alt="Вход">
+                <h3>Входная группа</h3>
+            </div>
+            <div class="photo-card">
+                <img src="/photos/index_3.jpg" alt="Территория">
+                <h3>Территория техникума</h3>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p><strong>© 2026 Ангарский политехнический техникум (АПТ)</strong></p>
+        <p>г. Ангарск, 52 квартал, 1 | Тел: +7 (3955) 55-55-55</p>
+        <p>Все права защищены.</p>
+    </footer>
+    
+    <script>
+        async function checkSession() {
+            const res = await fetch('/api/session');
+            const data = await res.json();
+            const userInfo = document.getElementById('userInfo');
+            
+            if (data.loggedIn) {
+                // УБРАНЫ дублирующие ссылки на Студенты и Преподаватели
+                userInfo.innerHTML = `
+                    <span>👤 ${data.username}</span>
+                    <button onclick="logout()" style="background:none;border:1px solid white;color:white;padding:5px 15px;cursor:pointer;border-radius:5px;">Выход</button>
+                `;
+            } else {
+                userInfo.innerHTML = `
+                    <a href="/login">Вход</a>
+                    <a href="/register">Регистрация</a>
+                `;
+            }
+        }
+        
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.reload();
+        }
+        
+        checkSession();
+    </script>
+</body>
+</html>

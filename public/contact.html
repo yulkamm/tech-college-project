@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты - АПТ</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
+        
+        nav { 
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
+            padding: 15px 30px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav a { color: white; margin-right: 20px; text-decoration: none; }
+        nav a:hover { opacity: 0.8; }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.8em; margin-bottom: 10px; }
+        .header p { font-size: 1.3em; opacity: 0.9; }
+        
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 30px;
+        }
+        
+        .contacts-main {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        .contact-card {
+            background: white;
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .contact-card:hover { transform: translateY(-5px); }
+        .contact-card h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 10px;
+        }
+        .contact-card p {
+            color: #555;
+            margin: 12px 0;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .contact-card .icon {
+            font-size: 1.3em;
+            width: 30px;
+        }
+        
+        .staff-section {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 50px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .staff-section h2 {
+            text-align: center;
+            color: #1e3c72;
+            margin-bottom: 40px;
+            font-size: 2.2em;
+        }
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .staff-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f9f9f9;
+            transition: transform 0.3s;
+        }
+        .staff-card:hover { transform: translateY(-5px); }
+        .staff-card img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 4px solid #2a5298;
+        }
+        .staff-card h3 {
+            color: #1e3c72;
+            margin-bottom: 8px;
+            font-size: 1.3em;
+        }
+        .staff-card p {
+            color: #666;
+            font-size: 1em;
+            margin: 5px 0;
+        }
+        .staff-card .position {
+            color: #2a5298;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .map-section {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .map-section h2 {
+            color: #1e3c72;
+            margin-bottom: 25px;
+            font-size: 2em;
+            text-align: center;
+        }
+        .map-container {
+            width: 100%;
+            height: 450px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div>
+            <a href="/" style="font-size: 1.3em; font-weight: bold;">🎓 АПТ</a>
+            <a href="/about">О техникуме</a>
+            <a href="/contact" style="font-weight: bold; border-bottom: 2px solid white;">Контакты</a>
+            <a href="/students">Студенты</a>
+            <a href="/teachers">Преподаватели</a>
+        </div>
+        <div id="userInfo" style="color: white;"></div>
+    </nav>
+    
+    <div class="header">
+        <h1>Контактная информация</h1>
+        <p>Свяжитесь с нами удобным для вас способом</p>
+    </div>
+    
+    <div class="content">
+        <div class="contacts-main">
+            <div class="contact-card">
+                <h2>📞 Телефоны</h2>
+                <p><span class="icon">📞</span> Приемная: +7 (3955) 55-55-55</p>
+                <p><span class="icon">📞</span> Приемная комиссия: +7 (3955) 55-55-56</p>
+                <p><span class="icon">📞</span> Учебный отдел: +7 (3955) 55-55-57</p>
+                <p><span class="icon">📱</span> Горячая линия: +7 (3955) 55-55-58</p>
+            </div>
+            
+            <div class="contact-card">
+                <h2>✉️ Электронная почта</h2>
+                <p><span class="icon">📧</span> info@apt-angarsk.ru</p>
+                <p><span class="icon">📧</span> priem@apt-angarsk.ru</p>
+                <p><span class="icon">📧</span> ucheb@apt-angarsk.ru</p>
+                <p><span class="icon">📧</span> director@apt-angarsk.ru</p>
+            </div>
+            
+            <div class="contact-card">
+                <h2>🕐 Режим работы</h2>
+                <p><span class="icon">📅</span> Пн-Пт: 8:30 - 17:00</p>
+                <p><span class="icon">📅</span> Сб: 9:00 - 13:00</p>
+                <p><span class="icon">📅</span> Вс: выходной</p>
+                <p><span class="icon">🍽️</span> Обед: 12:30 - 13:00</p>
+            </div>
+            
+            <div class="contact-card">
+                <h2>📍 Адрес</h2>
+                <p><span class="icon">🏢</span> г. Ангарск, 52 квартал, 1</p>
+                <p><span class="icon">🚌</span> Остановка: "Политехнический техникум"</p>
+                <p><span class="icon">🚗</span> Парковка для посетителей</p>
+                <p><span class="icon">♿</span> Доступная среда</p>
+            </div>
+        </div>
+        
+        <div class="staff-section">
+            <h2>👥 Наши сотрудники</h2>
+            <div class="staff-grid">
+                <div class="staff-card">
+                    <img src="/photos/contact_1.jpg" alt="Директор" onerror="this.src='/photos/contact_1.jpg'">
+                    <h3>Иванов Иван Иванович</h3>
+                    <p class="position">Директор техникума</p>
+                    <p>📞 +7 (3955) 55-55-55</p>
+                    <p>📧 director@apt-angarsk.ru</p>
+                </div>
+                
+                <div class="staff-card">
+                    <img src="/photos/contact_2.jpg" alt="Заместитель" onerror="this.src='/photos/contact_2.jpg'">
+                    <h3>Петрова Мария Петровна</h3>
+                    <p class="position">Заместитель директора</p>
+                    <p>📞 +7 (3955) 55-55-59</p>
+                    <p>📧 zamp@apt-angarsk.ru</p>
+                </div>
+                
+                <div class="staff-card">
+                    <img src="/photos/contact_3.jpg" alt="Преподаватель" onerror="this.src='/photos/contact_3.jpg'">
+                    <h3>Сидоров Алексей Владимирович</h3>
+                    <p class="position">Преподаватель IT-дисциплин</p>
+                    <p>📞 +7 (3955) 55-55-60</p>
+                    <p>📧 sidorov@apt-angarsk.ru</p>
+                </div>
+                
+                <div class="staff-card">
+                    <img src="/photos/contact_4.jpg" alt="Преподаватель" onerror="this.src='/photos/contact_4.jpg'">
+                    <h3>Козлова Елена Сергеевна</h3>
+                    <p class="position">Преподаватель математики</p>
+                    <p>📞 +7 (3955) 55-55-61</p>
+                    <p>📧 kozlova@apt-angarsk.ru</p>
+                </div>
+                
+                <div class="staff-card">
+                    <img src="/photos/contact_5.jpg" alt="Приемная комиссия" onerror="this.src='/photos/contact_5.jpg'">
+                    <h3>Новикова Анна Дмитриевна</h3>
+                    <p class="position">Ответственный приемной комиссии</p>
+                    <p>📞 +7 (3955) 55-55-56</p>
+                    <p>📧 priem@apt-angarsk.ru</p>
+                </div>
+                
+                <div class="staff-card">
+                    <img src="/photos/contact_6.jpg" alt="Учебный отдел" onerror="this.src='/photos/contact_6.jpg'">
+                    <h3>Морозов Сергей Николаевич</h3>
+                    <p class="position">Заведующий учебным отделом</p>
+                    <p>📞 +7 (3955) 55-55-57</p>
+                    <p>📧 ucheb@apt-angarsk.ru</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="map-section">
+            <h2>🗺️ Мы на карте</h2>
+            <div class="map-container">
+                <iframe src="https://yandex.ru/map-widget/v1/?text=Ангарск+52+квартал+1" frameborder="0" allowfullscreen="true" style="width:100%; height:100%;"></iframe>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function checkSession() {
+            const res = await fetch('/api/session');
+            const data = await res.json();
+            const userInfo = document.getElementById('userInfo');
+            
+            if (data.loggedIn) {
+                // УБРАНЫ дублирующие ссылки на Студенты и Преподаватели
+                userInfo.innerHTML = `
+                    <span>👤 ${data.username}</span>
+                    <button onclick="logout()" style="margin-left: 15px; background:none; border:1px solid white; color: white; padding: 5px 15px; cursor: pointer;">Выход</button>
+                `;
+            } else {
+                userInfo.innerHTML = `
+                    <a href="/login" style="color: white;">Вход</a>
+                    <a href="/register" style="color: white;">Регистрация</a>
+                `;
+            }
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/';
+        }
+
+        checkSession();
+    </script>
+</body>
+</html>

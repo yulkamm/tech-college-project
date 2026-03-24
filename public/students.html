@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Студенты - АПТ</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
+        
+        nav { 
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
+            padding: 15px 30px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav a { color: white; margin-right: 20px; text-decoration: none; }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px; }
+        h1 { color: #1e3c72; margin-bottom: 30px; text-align: center; }
+        
+        table { 
+            width: 100%; 
+            background: white; 
+            border-radius: 10px; 
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        th { background: #1e3c72; color: white; }
+        tr:hover { background: #f9f9f9; }
+        
+        .photo-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; }
+        
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 2px;
+            font-size: 13px;
+        }
+        .btn-view { background: #9C27B0; color: white; }
+        .btn-edit { background: #2196F3; color: white; }
+        .btn-delete { background: #f44336; color: white; }
+        .btn-add { background: #4CAF50; color: white; padding: 10px 20px; margin-bottom: 20px; }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .pagination button {
+            padding: 8px 15px;
+            border: 2px solid #1e3c72;
+            background: white;
+            color: #1e3c72;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .pagination button:hover { background: #1e3c72; color: white; }
+        .pagination button.active { background: #1e3c72; color: white; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-content h2 { margin-bottom: 20px; color: #1e3c72; }
+        .modal-content label { display: block; margin: 10px 0 5px; font-weight: 600; }
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-buttons button { flex: 1; }
+        
+        .photo-large {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: 10px auto;
+            display: block;
+            border: 3px solid #2a5298;
+        }
+        
+        .info-row {
+            display: flex;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .info-label { font-weight: bold; width: 180px; color: #1e3c72; }
+        .info-value { flex: 1; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div>
+            <a href="/" style="font-size: 1.3em; font-weight: bold;">🎓 АПТ</a>
+            <a href="/about">О техникуме</a>
+            <a href="/contact">Контакты</a>
+            <a href="/students" style="font-weight: bold; border-bottom: 2px solid white;">Студенты</a>
+            <a href="/teachers">Преподаватели</a>
+        </div>
+        <div id="userInfo" style="color: white;"></div>
+    </nav>
+    
+    <div class="container">
+        <h1>👨‍🎓 Наши студенты</h1>
+        
+        <div id="adminControls" style="display: none; margin-bottom: 20px;">
+            <button class="btn btn-add" onclick="openModal('add')">+ Добавить студента</button>
+        </div>
+        
+        <div id="loading" style="text-align: center; padding: 40px; font-size: 1.2em;">Загрузка...</div>
+        
+        <table id="studentsTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Фото</th>
+                    <th>ФИО</th>
+                    <th>Группа</th>
+                    <th>Email</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        
+        <div id="pagination" class="pagination" style="display: none;"></div>
+    </div>
+
+    <!-- View Modal -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <h2>📖 Информация о студенте</h2>
+            <div id="viewContent"></div>
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeModal('view')" style="background: #999; color: white;">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit/Add Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Добавить студента</h2>
+            <form id="studentForm">
+                <label>ФИО *</label>
+                <input type="text" name="full_name" required>
+                
+                <label>Группа *</label>
+                <input type="text" name="group_name" required>
+                
+                <label>Фото</label>
+                <select name="photo" id="photoSelect" onchange="updatePreview()">
+                    <option value="students_1.jpg">students_1.jpg</option>
+                    <option value="students_2.jpg">students_2.jpg</option>
+                    <option value="students_3.jpg">students_3.jpg</option>
+                    <option value="students_4.jpg">students_4.jpg</option>
+                    <option value="students_5.jpg">students_5.jpg</option>
+                </select>
+                <img id="photoPreview" class="photo-large" src="/photos/students_1.jpg">
+                
+                <label>Email</label>
+                <input type="email" name="email">
+                
+                <label>Телефон</label>
+                <input type="text" name="phone">
+                
+                <label>Дата рождения</label>
+                <input type="date" name="birth_date">
+                
+                <label>Адрес</label>
+                <input type="text" name="address">
+                
+                <label>ФИО родителя</label>
+                <input type="text" name="parent_name">
+                
+                <label>Телефон родителя</label>
+                <input type="text" name="parent_phone">
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn" onclick="closeModal('edit')" style="background: #999; color: white;">Отмена</button>
+                    <button type="submit" class="btn btn-add">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentEditId = null;
+        let isAdmin = false;
+        let allStudents = [];
+        let currentPage = 1;
+        const perPage = 5;
+
+        async function loadStudents() {
+            try {
+                const res = await fetch('/api/students');
+                allStudents = await res.json();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('studentsTable').style.display = 'table';
+                renderTable();
+                renderPagination();
+            } catch (err) {
+                document.getElementById('loading').textContent = 'Ошибка загрузки';
+            }
+        }
+
+        function renderTable() {
+            const start = (currentPage - 1) * perPage;
+            const end = start + perPage;
+            const pageData = allStudents.slice(start, end);
+            
+            const tbody = document.querySelector('#studentsTable tbody');
+            tbody.innerHTML = pageData.map(s => {
+                let actions = '';
+                
+                // Кнопка ПРОСМОТР - для ВСЕХ
+                actions += `<button class="btn btn-view" onclick="viewStudent(${s.id})">👁</button>`;
+                
+                // Кнопки РЕДАКТИРОВАТЬ/УДАЛИТЬ - только для АДМИНА
+                if (isAdmin) {
+                    actions += `
+                        <button class="btn btn-edit" onclick="editStudent(${s.id})">✏</button>
+                        <button class="btn btn-delete" onclick="deleteStudent(${s.id})">🗑</button>
+                    `;
+                }
+                
+                return `
+                    <tr>
+                        <td>${s.id}</td>
+                        <td><img src="/photos/${s.photo}" class="photo-thumb" onerror="this.src='/photos/students_1.jpg'"></td>
+                        <td>${s.full_name}</td>
+                        <td>${s.group_name}</td>
+                        <td>${s.email || '-'}</td>
+                        <th id="actionsHeader">${actions}</th>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(allStudents.length / perPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            pagination.style.display = 'flex';
+            let html = '';
+            
+            html += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Назад</button>`;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+            }
+            
+            html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Вперёд →</button>`;
+            
+            pagination.innerHTML = html;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(allStudents.length / perPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+            renderPagination();
+        }
+
+        function viewStudent(id) {
+            const student = allStudents.find(s => s.id === id);
+            if (!student) return;
+            
+            document.getElementById('viewContent').innerHTML = `
+                <img src="/photos/${student.photo}" class="photo-large" onerror="this.src='/photos/students_1.jpg'">
+                <div class="info-row"><div class="info-label">ID:</div><div class="info-value">${student.id}</div></div>
+                <div class="info-row"><div class="info-label">ФИО:</div><div class="info-value">${student.full_name}</div></div>
+                <div class="info-row"><div class="info-label">Группа:</div><div class="info-value">${student.group_name}</div></div>
+                <div class="info-row"><div class="info-label">Email:</div><div class="info-value">${student.email || '-'}</div></div>
+                <div class="info-row"><div class="info-label">Телефон:</div><div class="info-value">${student.phone || '-'}</div></div>
+                <div class="info-row"><div class="info-label">Дата рождения:</div><div class="info-value">${student.birth_date || '-'}</div></div>
+                <div class="info-row"><div class="info-label">Адрес:</div><div class="info-value">${student.address || '-'}</div></div>
+                <div class="info-row"><div class="info-label">ФИО родителя:</div><div class="info-value">${student.parent_name || '-'}</div></div>
+                <div class="info-row"><div class="info-label">Телефон родителя:</div><div class="info-value">${student.parent_phone || '-'}</div></div>
+            `;
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function openModal(mode, id = null) {
+            currentEditId = id;
+            document.getElementById('editModal').classList.add('active');
+            
+            if (mode === 'edit' && id) {
+                document.getElementById('modalTitle').textContent = 'Редактировать студента';
+                const student = allStudents.find(s => s.id === id);
+                if (student) {
+                    document.getElementById('studentForm').elements.full_name.value = student.full_name;
+                    document.getElementById('studentForm').elements.group_name.value = student.group_name;
+                    document.getElementById('studentForm').elements.photo.value = student.photo;
+                    document.getElementById('studentForm').elements.email.value = student.email || '';
+                    document.getElementById('studentForm').elements.phone.value = student.phone || '';
+                    document.getElementById('studentForm').elements.birth_date.value = student.birth_date || '';
+                    document.getElementById('studentForm').elements.address.value = student.address || '';
+                    document.getElementById('studentForm').elements.parent_name.value = student.parent_name || '';
+                    document.getElementById('studentForm').elements.parent_phone.value = student.parent_phone || '';
+                    updatePreview();
+                }
+            } else {
+                document.getElementById('modalTitle').textContent = 'Добавить студента';
+                document.getElementById('studentForm').reset();
+                updatePreview();
+            }
+        }
+
+        function editStudent(id) {
+            openModal('edit', id);
+        }
+
+        async function deleteStudent(id) {
+            if (confirm('Удалить студента?')) {
+                try {
+                    await fetch(`/api/students/${id}`, { method: 'DELETE' });
+                    loadStudents();
+                } catch (err) {
+                    alert('Ошибка удаления');
+                }
+            }
+        }
+
+        function closeModal(modal) {
+            document.getElementById(modal + 'Modal').classList.remove('active');
+        }
+
+        function updatePreview() {
+            const photo = document.getElementById('photoSelect').value;
+            document.getElementById('photoPreview').src = `/photos/${photo}`;
+        }
+
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                if (currentEditId) {
+                    await fetch(`/api/students/${currentEditId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    await fetch('/api/students', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+                closeModal('edit');
+                loadStudents();
+            } catch (err) {
+                alert('Ошибка сохранения');
+            }
+        });
+
+        async function checkSession() {
+            const res = await fetch('/api/session');
+            const data = await res.json();
+            const userInfo = document.getElementById('userInfo');
+            
+            isAdmin = data.loggedIn && data.role === 'admin';
+            
+            if (data.loggedIn) {
+                // УБРАНЫ ссылки на Студенты и Преподаватели
+                if (isAdmin) {
+                    document.getElementById('adminControls').style.display = 'block';
+                }
+                
+                userInfo.innerHTML = `
+                    👤 ${data.username}
+                    <button onclick="logout()" style="margin-left: 15px; background:none; border:1px solid white; color: white; padding: 5px 15px; cursor: pointer;">Выход</button>
+                `;
+            } else {
+                userInfo.innerHTML = '<a href="/login" style="color: white;">Вход</a>';
+            }
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/';
+        }
+
+        loadStudents();
+        checkSession();
+    </script>
+</body>
+</html>

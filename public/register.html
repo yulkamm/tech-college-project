@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - АПТ</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .register-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input:focus { outline: none; border-color: #667eea; }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover { transform: translateY(-2px); }
+        .links { text-align: center; margin-top: 20px; }
+        .links a { color: #667eea; text-decoration: none; }
+        .error { color: red; margin-top: 10px; text-align: center; }
+        .success { color: green; margin-top: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h1>Регистрация</h1>
+        <form id="registerForm">
+            <input type="text" id="username" placeholder="Придумайте логин" required>
+            <input type="password" id="password" placeholder="Придумайте пароль" required>
+            <input type="password" id="confirmPassword" placeholder="Подтвердите пароль" required>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        <div id="message"></div>
+        <div class="links">
+            <p>Уже есть аккаунт? <a href="/login">Войти</a></p>
+            <p><a href="/">На главную</a></p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const messageDiv = document.getElementById('message');
+            
+            if (password !== confirmPassword) {
+                messageDiv.innerHTML = '<div class="error">Пароли не совпадают!</div>';
+                return;
+            }
+            
+            if (password.length < 4) {
+                messageDiv.innerHTML = '<div class="error">Пароль должен быть не менее 4 символов!</div>';
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    messageDiv.innerHTML = '<div class="success">' + data.message + '</div>';
+                    document.getElementById('registerForm').reset();
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    messageDiv.innerHTML = '<div class="error">' + data.error + '</div>';
+                }
+            } catch (err) {
+                messageDiv.innerHTML = '<div class="error">Ошибка сервера: ' + err.message + '</div>';
+            }
+        });
+    </script>
+</body>
+</html>
