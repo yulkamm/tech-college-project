@@ -15,16 +15,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/photos', express.static(path.join(__dirname, 'public/photos')));
 
-// Session - ИСПРАВЛЕНО для production
+// Session - ИСПРАВЛЕНО
 app.use(session({
     secret: process.env.SESSION_SECRET || 'tech-college-secret-2026',
     resave: false,
     saveUninitialized: false,
     cookie: { 
         maxAge: 24 * 60 * 60 * 1000,
-        secure: isProduction,
+        secure: true,  // Всегда true для HTTPS
         httpOnly: true,
-        sameSite: isProduction ? 'none' : 'lax'
+        sameSite: 'none'  // Всегда none для кросс-доменных запросов
     }
 }));
 
