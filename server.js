@@ -22,13 +22,13 @@ app.use(session({
     saveUninitialized: false,
     cookie: { 
         maxAge: 24 * 60 * 60 * 1000,
-        secure: isProduction,  // HTTPS только в production
+        secure: isProduction,
         httpOnly: true,
         sameSite: isProduction ? 'none' : 'lax'
     }
 }));
 
-// Database - ИСПРАВЛЕНО: поддержка SSL для production
+// Database - поддержка SSL для production
 const dbConfig = {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'tech_user',
@@ -42,6 +42,7 @@ const dbConfig = {
 
 let pool;
 
+// ==================== ИНИЦИАЛИЗАЦИЯ БД С АВТО-СОЗДАНИЕМ ТАБЛИЦ ====================
 async function initDB() {
     try {
         pool = mysql.createPool(dbConfig);
@@ -49,19 +50,87 @@ async function initDB() {
         console.log('✅ Database connected!');
         console.log('📊 Host:', dbConfig.host);
         console.log('📊 Database:', dbConfig.database);
+        
+        // Создаём таблицу users если не существует
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(50) NOT NULL UNIQUE,
+                password_hash VARCHAR(255) NOT NULL,
+                role ENUM('admin', 'student') DEFAULT 'student',
+                photo VARCHAR(255) DEFAULT 'users_1.jpg',
+                email VARCHAR(100),
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ Table "users" checked/created');
+        
+        // Создаём таблицу students если не существует
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS students (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                full_name VARCHAR(100) NOT NULL,
+                group_name VARCHAR(20) NOT NULL,
+                photo VARCHAR(255) DEFAULT 'students_1.jpg',
+                email VARCHAR(100),
+                phone VARCHAR(20),
+                birth_date DATE,
+                address VARCHAR(255),
+                parent_name VARCHAR(100),
+                parent_phone VARCHAR(20)
+            )
+        `);
+        console.log('✅ Table "students" checked/created');
+        
+        // Создаём таблицу teachers если не существует
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS teachers (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                full_name VARCHAR(100) NOT NULL,
+                subject VARCHAR(100) NOT NULL,
+                photo VARCHAR(255) DEFAULT 'teachers_1.jpg',
+                email VARCHAR(100),
+                phone VARCHAR(20),
+                experience INT,
+                education VARCHAR(255),
+                category VARCHAR(100),
+                office VARCHAR(50)
+            )
+        `);
+        console.log('✅ Table "teachers" checked/created');
+        
+        // Создаём админа если не существует
+        const [adminRows] = await connection.execute(
+            'SELECT id FROM users WHERE username = ?', 
+            ['admin']
+        );
+        
+        if (adminRows.length === 0) {
+            const adminHash = await bcrypt.hash('admin123', 10);
+            await connection.execute(
+                `INSERT INTO users (username, password_hash, role, photo, email, created_at) 
+                 VALUES ('admin', ?, 'admin', 'users_1.jpg', 'admin@college.ru', NOW())`,
+                [adminHash]
+            );
+            console.log('✅ Admin user created (password: admin123)');
+        } else {
+            console.log('✅ Admin user already exists');
+        }
+        
         connection.release();
     } catch (err) {
-        console.error('❌ Database connection error:', err.message);
-        console.error('💡 Проверьте переменные окружения в .env или на хостинге');
+        console.error('❌ Database initialization error:', err.message);
+        console.error('💡 Проверьте переменные окружения и подключение к БД');
     }
 }
 
-// Check admin middleware
+// ==================== MIDDLEWARE ====================
+
 function isAdmin(req, res, next) {
     if (req.session.role === 'admin') {
         next();
     } else {
-        console.log('⚠️ Доступ запрещён:', req.session.username, req.path);
+        console.log('⚠️ Доступ запрещён:', req.session?.username || 'anon', req.path);
         res.status(403).json({ error: 'Только для админов' });
     }
 }
@@ -129,7 +198,6 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ error: 'Неверный пароль' });
         }
         
-        // Сохраняем в сессию
         req.session.userId = user.id;
         req.session.username = user.username;
         req.session.role = user.role;
@@ -183,10 +251,10 @@ app.get('/api/students', async (req, res) => {
 
 app.post('/api/students', isAdmin, async (req, res) => {
     try {
-        const { full_name, group_name, photo, email, phone, birth_date } = req.body;
+        const { full_name, group_name, photo, email, phone, birth_date, address, parent_name, parent_phone } = req.body;
         const [result] = await pool.execute(
-            'INSERT INTO students (full_name, group_name, photo, email, phone, birth_date) VALUES (?, ?, ?, ?, ?, ?)',
-            [full_name, group_name, photo || 'students_1.jpg', email, phone, birth_date]
+            'INSERT INTO students (full_name, group_name, photo, email, phone, birth_date, address, parent_name, parent_phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [full_name, group_name, photo || 'students_1.jpg', email, phone, birth_date, address, parent_name, parent_phone]
         );
         console.log('✅ Студент добавлен, ID:', result.insertId);
         res.json({ success: true, id: result.insertId });
@@ -198,10 +266,10 @@ app.post('/api/students', isAdmin, async (req, res) => {
 
 app.put('/api/students/:id', isAdmin, async (req, res) => {
     try {
-        const { full_name, group_name, photo, email, phone, birth_date } = req.body;
+        const { full_name, group_name, photo, email, phone, birth_date, address, parent_name, parent_phone } = req.body;
         await pool.execute(
-            'UPDATE students SET full_name=?, group_name=?, photo=?, email=?, phone=?, birth_date=? WHERE id=?',
-            [full_name, group_name, photo, email, phone, birth_date, req.params.id]
+            'UPDATE students SET full_name=?, group_name=?, photo=?, email=?, phone=?, birth_date=?, address=?, parent_name=?, parent_phone=? WHERE id=?',
+            [full_name, group_name, photo, email, phone, birth_date, address, parent_name, parent_phone, req.params.id]
         );
         console.log('✅ Студент обновлён, ID:', req.params.id);
         res.json({ success: true });
@@ -236,10 +304,10 @@ app.get('/api/teachers', async (req, res) => {
 
 app.post('/api/teachers', isAdmin, async (req, res) => {
     try {
-        const { full_name, subject, photo, email, phone, experience } = req.body;
+        const { full_name, subject, photo, email, phone, experience, education, category, office } = req.body;
         const [result] = await pool.execute(
-            'INSERT INTO teachers (full_name, subject, photo, email, phone, experience) VALUES (?, ?, ?, ?, ?, ?)',
-            [full_name, subject, photo || 'teachers_1.jpg', email, phone, experience]
+            'INSERT INTO teachers (full_name, subject, photo, email, phone, experience, education, category, office) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [full_name, subject, photo || 'teachers_1.jpg', email, phone, experience, education, category, office]
         );
         console.log('✅ Преподаватель добавлен, ID:', result.insertId);
         res.json({ success: true, id: result.insertId });
@@ -251,10 +319,10 @@ app.post('/api/teachers', isAdmin, async (req, res) => {
 
 app.put('/api/teachers/:id', isAdmin, async (req, res) => {
     try {
-        const { full_name, subject, photo, email, phone, experience } = req.body;
+        const { full_name, subject, photo, email, phone, experience, education, category, office } = req.body;
         await pool.execute(
-            'UPDATE teachers SET full_name=?, subject=?, photo=?, email=?, phone=?, experience=? WHERE id=?',
-            [full_name, subject, photo, email, phone, experience, req.params.id]
+            'UPDATE teachers SET full_name=?, subject=?, photo=?, email=?, phone=?, experience=?, education=?, category=?, office=? WHERE id=?',
+            [full_name, subject, photo, email, phone, experience, education, category, office, req.params.id]
         );
         console.log('✅ Преподаватель обновлён, ID:', req.params.id);
         res.json({ success: true });
@@ -284,7 +352,7 @@ app.listen(PORT, async () => {
     await initDB();
 });
 
-// Обработка незакрытых соединений при завершении
+// Обработка завершения
 process.on('SIGINT', async () => {
     console.log('🛑 Завершение работы...');
     if (pool) {
